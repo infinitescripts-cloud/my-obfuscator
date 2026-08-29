@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b10">
+<title>Reboot Obfuscator V2</title>
+<style>
+:root{--bg:#080a0f;--panel:#10131a;--panel2:#151923;--line:#272d39;--text:#f5f6f8;--muted:#9299a8;--a:#ffb000;--a2:#ffd76a;--ok:#58d68d;--bad:#ff626d;--r:17px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:18px}.app{max-width:1240px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:45px;height:45px;border-radius:14px;display:grid;place-items:center;font-weight:950;color:var(--a);background:#15130d;border:1px solid #3b321e}
+h1{font-size:20px;margin:0;letter-spacing:-.5px}.sub{font-size:11px;color:var(--muted);margin-top:3px}.pill{font-size:10px;font-weight:800;color:var(--a2);border:1px solid #42361d;background:#17140d;border-radius:99px;padding:7px 10px}
+.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.55fr);gap:14px}.stack{display:grid;gap:14px}
+.card{background:linear-gradient(180deg,#11141b,#0e1117);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:0 14px 38px #0005}
+.head{padding:14px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.head strong{font-size:13px}
+.body{padding:13px}textarea{display:block;width:100%;height:385px;min-height:230px;resize:vertical;border:1px solid #252b36;border-radius:12px;background:#090b10;color:#dfe3eb;outline:none;padding:13px;font:12px/1.55 "SFMono-Regular",Consolas,monospace}
+textarea:focus{border-color:#705517;box-shadow:0 0 0 3px #ffb00012}.drop{display:flex;align-items:center;justify-content:space-between;gap:9px;border:1px dashed #363c48;border-radius:12px;padding:9px 10px;margin-bottom:9px;color:var(--muted);font-size:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.btn{border:1px solid var(--line);background:#171a22;color:var(--text);border-radius:10px;padding:9px 12px;font-size:11px;font-weight:800}.btn:hover{filter:brightness(1.12)}.primary{background:var(--a);border-color:var(--a);color:#171208}.file{display:none}
+.opts{display:grid;gap:8px}.row{border:1px solid var(--line);background:#0c0f15;border-radius:12px;padding:10px}.row label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;font-weight:750}.row small{display:block;color:var(--muted);font-size:9px;line-height:1.35;margin-top:5px}
+select{width:100%;background:#0c0f15;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px;outline:none;font-size:11px}
+.switch{position:relative;width:37px;height:20px;display:block;flex:none}.switch input{display:none}.slider{position:absolute;inset:0;background:#292e38;border-radius:99px}.slider:before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#aeb4bf;border-radius:50%;transition:.16s}.switch input:checked+.slider{background:#966e00}.switch input:checked+.slider:before{transform:translateX(17px);background:#fff0b0}
+.notice{border:1px solid #3a311f;background:#15120c;color:#c9b980;border-radius:12px;padding:10px;font-size:9px;line-height:1.45}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}.stat b{font-size:16px}.stat span{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:10px}.status b{color:var(--ok)}
+.footer{text-align:center;color:#626976;font-size:9px;margin:14px 0 3px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}@media(max-width:520px){body{padding:10px}.stats{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start}.pill{display:none}textarea{height:330px}.drop{flex-direction:column;align-items:flex-start}.btn{flex:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><div class="logo">R</div><div><h1>Reboot Obfuscator</h1><div class="sub">Luau / Lua source transformer · V2</div></div></div>
+  <div class="pill">V2 • LOCAL PROCESSING</div>
+</header>
+
+<div class="layout">
+<section class="stack">
+  <div class="card">
+    <div class="head"><strong>Source</strong><span id="filename" class="sub">No file loaded</span></div>
+    <div class="body">
+      <div class="drop"><span>Drop .lua / .luau / .txt or paste source</span><label class="btn" for="file">Choose file</label><input id="file" class="file" type="file" accept=".lua,.luau,.txt,text/plain"></div>
+      <textarea id="input" spellcheck="false" placeholder="Paste Luau/Lua here..."></textarea>
+    </div>
+  </div>
+  <div class="card">
+    <div class="head"><strong>Obfuscated output</strong><span id="outBytes" class="sub">0 bytes</span></div>
+    <div class="body">
+      <textarea id="output" spellcheck="false" readonly placeholder="Output appears here after processing..."></textarea>
+      <div class="actions">
+        <button id="run" class="btn primary">Obfuscate</button><button id="copy" class="btn">Copy</button><button id="download" class="btn">Download .lua</button><button id="clear" class="btn">Clear</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<aside class="stack">
+  <div class="card">
+    <div class="head"><strong>V2 profile</strong></div>
+    <div class="body opts">
+      <div class="row"><label>Strength</label><select id="strength"><option value="light">Light — safer / readable</option><option value="standard" selected>Standard — balanced</option><option value="strong">Strong — more transformation</option></select></div>
+      <div class="row"><label>Rename locals <span class="switch"><input id="rename" type="checkbox" checked><i class="slider"></i></span></label><small>Scope-aware-ish renaming of declared local variables and local functions.</small></div>
+      <div class="row"><label>Encode strings <span class="switch"><input id="strings" type="checkbox" checked><i class="slider"></i></span></label><small>Transforms ordinary quoted strings into string.char calls.</small></div>
+      <div class="row"><label>Transform numbers <span class="switch"><input id="numbers" type="checkbox"><i class="slider"></i></span></label><small>Turns safe decimal integer literals into arithmetic expressions.</small></div>
+      <div class="row"><label>Remove comments <span class="switch"><input id="comments" type="checkbox" checked><i class="slider"></i></span></label><small>Preserves strings and long strings while removing comments.</small></div>
+      <div class="row"><label>Minify <span class="switch"><input id="minify" type="checkbox" checked><i class="slider"></i></span></label><small>Token-based output removes unnecessary whitespace without executing source.</small></div>
+      <div class="row"><label>Random seed <span class="switch"><input id="random" type="checkbox" checked><i class="slider"></i></span></label><small>Generates different names/expressions on each run.</small></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="head"><strong>Safety</strong></div>
+    <div class="body">
+      <div class="notice">V2 does not use <b>eval</b> or <b>new Function</b>, and it never executes the source you paste. Generated code should still be tested in a safe environment before use.</div>
+      <div class="status"><span>Status</span><b id="status">Ready</b></div>
+    </div>
+  </div>
+</aside>
+</div>
+
+<div class="stats">
+  <div class="stat"><b id="ib">0</b><span>Input bytes</span></div><div class="stat"><b id="il">0</b><span>Input lines</span></div><div class="stat"><b id="ob">0</b><span>Output bytes</span></div><div class="stat"><b id="change">0%</b><span>Size change</span></div>
+</div>
+<div class="footer">Reboot Obfuscator V2 · Single-file browser tool · Obfuscation is not encryption.</div>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id), input=$("input"), output=$("output");
+const KEYWORDS=new Set(("and break do else elseif end false for function goto if in local nil not or repeat return then true until while type export continue self").split(" "));
+const BUILTINS=new Set(("assert collectgarbage error getmetatable ipairs load next pairs pcall print rawequal rawget rawlen rawset select setmetatable tonumber tostring type warn xpcall coroutine debug math os string table utf8 task game workspace script shared _G _ENV require").split(" "));
+
+function size(s){return new TextEncoder().encode(s).length}
+function stats(){
+ const a=input.value,b=output.value,ai=size(a),bo=size(b);
+ $("ib").textContent=ai;$("il").textContent=a?a.split(/\r?\n/).length:0;$("ob").textContent=bo;$("outBytes").textContent=bo+" bytes";
+ $("change").textContent=ai?((bo-ai>=0?"+":"")+Math.round((bo-ai)/ai*100)+"%"):"0%";
+}
+function status(s,ok=false){$("status").textContent=s;$("status").style.color=ok?"var(--ok)":"var(--muted)"}
+
+function lex(src,strip){
+ const t=[];let i=0;
+ const id0=c=>/[A-Za-z_]/.test(c), idc=c=>/[A-Za-z0-9_]/.test(c);
+ while(i<src.length){
+  let c=src[i];
+  if(/\s/.test(c)){i++;continue}
+  if(strip&&c==="-"&&src[i+1]==="-"){
+   const m=src.slice(i).match(/^--\[(=*)\[/);
+   if(m){const close="]"+m[1]+"]",p=src.indexOf(close,i+m[0].length);i=p<0?src.length:p+close.length;continue}
+   i+=2;while(i<src.length&&src[i]!=="\n")i++;continue
+  }
+  if(c==="\""||c==="'"){
+   const q=c;let j=i+1;while(j<src.length){if(src[j]==="\\"){j+=2;continue}if(src[j]===q){j++;break}j++}
+   t.push({k:"str",v:src.slice(i,j)});i=j;continue
+  }
+  if(c==="["){
+   const m=src.slice(i).match(/^\[(=*)\[/);
+   if(m){const close="]"+m[1]+"]",p=src.indexOf(close,i+m[0].length),j=p<0?src.length:p+close.length;t.push({k:"long",v:src.slice(i,j)});i=j;continue}
+  }
+  if(id0(c)){let j=i+1;while(j<src.length&&idc(src[j]))j++;t.push({k:"id",v:src.slice(i,j)});i=j;continue}
+  if(/[0-9]/.test(c)){
+   let j=i+1;while(j<src.length&&/[A-Za-z0-9._]/.test(src[j]))j++;t.push({k:"num",v:src.slice(i,j)});i=j;continue
+  }
+  const ops=["...","<<",">>","//","==","~=","<=",">=","..","::","+=","-=","*=","/=","%=","^="];
+  let op=ops.find(x=>src.startsWith(x,i));if(!op)op=c;t.push({k:"sym",v:op});i+=op.length
+ }
+ return t
+}
+function rndName(state){
+ if(state.random){let x;do{x="_"+Math.random().toString(36).slice(2,7)}while(state.used.has(x));state.used.add(x);return x}
+ return "_r"+(++state.count).toString(36)
+}
+function rename(t,state){
+ const map=new Map(),declared=new Set();
+ // Collect simple local declarations. Avoid globals, keywords and builtins.
+ for(let i=0;i<t.length;i++){
+  if(t[i].k==="id"&&t[i].v==="local"){
+   let j=i+1;
+   if(t[j]?.k==="id"&&t[j].v==="function")j++;
+   while(t[j]?.k==="id"&&!KEYWORDS.has(t[j].v)){
+    const n=t[j].v;if(!BUILTINS.has(n)){declared.add(n);if(!map.has(n))map.set(n,rndName(state))}
+    j++;if(t[j]?.v!==",")break;j++
+   }
+  }
+ }
+ // Rename references to identifiers that are known declarations.
+ return t.map(x=>x.k==="id"&&map.has(x.v)?{...x,v:map.get(x.v)}:x)
+}
+function decodeBasic(s){
+ if(s.length<2)return null;
+ const q=s[0];if((q!=="\""&&q!=="'")||s[s.length-1]!==q)return null;
+ let x=s.slice(1,-1);
+ x=x.replace(/\\z/g,"").replace(/\\([abfnrtv\\\"'])/g,(_,c)=>({a:"\x07",b:"\b",f:"\f",n:"\n",r:"\r",t:"\t",v:"\v","\\":"\\",'"':'"',"'":"'"})[c]??c);
+ return x
+}
+function encString(s){
+ const x=decodeBasic(s);if(x===null)return s;
+ if(!x)return '""';
+ const vals=[...x].map(ch=>ch.codePointAt(0));
+ return "string.char("+vals.join(",")+")"
+}
+function transformNumber(s,strong){
+ if(!/^\d+$/.test(s))return s;
+ const n=Number(s);if(!Number.isSafeInteger(n)||n<8||n>1000000)return s;
+ if(!strong&&n<32)return s;
+ const a=Math.max(2,Math.floor(Math.sqrt(n))),b=n-a;
+ return "("+a+"+"+b+")"
+}
+function render(t,opt){
+ let out="";
+ const word=x=>x&&(x.k==="id"||x.k==="num"||x.k==="str"||x.k==="long");
+ for(let i=0;i<t.length;i++){
+  let x={...t[i]};
+  if(opt.strings&&x.k==="str")x.v=encString(x.v);
+  if(opt.numbers&&x.k==="num")x.v=transformNumber(x.v,opt.strong);
+  const p=t[i-1], pv=p?.v, v=x.v;
+  let space=false;
+  if(p&&((p.k==="id"||p.k==="num")&&(x.k==="id"||x.k==="num"))))space=true;
+  if((pv==="local"||pv==="return"||pv==="function"||pv==="for"||pv==="in"||pv==="type"||pv==="export")&&(x.k==="id"||x.k==="num"||x.k==="str"))space=true;
+  if((pv==="and"||pv==="or"||pv==="not")||(["and","or","not"].includes(v)))space=true;
+  if(pv==="."&&x.k==="num")space=false;
+  if(space)out+=" ";
+  out+=v;
+ }
+ return out
+}
+function obfuscate(){
+ const src=input.value;if(!src.trim()){status("Add source first");return}
+ try{
+  status("Lexing…");
+  const strength=$("strength").value;
+  const opt={comments:$("comments").checked,rename:$("rename").checked,strings:$("strings").checked,numbers:$("numbers").checked,minify:$("minify").checked,random:$("random").checked,strong:strength==="strong"};
+  let t=lex(src,opt.comments);
+  const state={random:opt.random,used:new Set(),count:0};
+  if(opt.rename)t=rename(t,state);
+  status("Transforming…");
+  output.value=render(t,opt);
+  stats();status("Complete",true)
+ }catch(e){status("Error: "+e.message)}
+}
+$("run").onclick=obfuscate;
+$("copy").onclick=async()=>{
+ if(!output.value){status("Nothing to copy");return}
+ try{await navigator.clipboard.writeText(output.value)}catch{output.select();document.execCommand("copy")}
+ status("Copied",true)
+};
+$("download").onclick=()=>{
+ if(!output.value){status("Obfuscate first");return}
+ const a=document.createElement("a"),u=URL.createObjectURL(new Blob([output.value],{type:"text/plain;charset=utf-8"}));
+ a.href=u;a.download="obfuscated.lua";a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);status("Downloaded",true)
+};
+$("clear").onclick=()=>{input.value="";output.value="";$("filename").textContent="No file loaded";stats();status("Ready")};
+$("file").onchange=e=>loadFile(e.target.files?.[0]);
+function loadFile(f){
+ if(!f)return;if(!/\.(lua|luau|txt)$/i.test(f.name)){status("Unsupported file type");return}
+ const r=new FileReader();r.onload=()=>{input.value=String(r.result);$("filename").textContent=f.name;stats();status("File loaded",true)};r.onerror=()=>status("Could not read file");r.readAsText(f)
+}
+const drop=document.querySelector(".drop");
+["dragenter","dragover"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.style.borderColor="var(--a)"}));
+["dragleave","drop"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.style.borderColor=""}));
+drop.addEventListener("drop",e=>loadFile(e.dataTransfer.files?.[0]));
+input.oninput=stats;stats();
+</script>
+</body>
+</html>
